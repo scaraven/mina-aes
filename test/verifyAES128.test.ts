@@ -1,9 +1,9 @@
-import crypto from "crypto";
 import {
   computeIterativeAes128Encryption,
   IterativeAes128,
   IterativeAES128PublicInput as AESPublicInput,
 } from "../src/implementations/IterativeAES128.js";
+import { encryptAES128 } from "../src/utils/crypto.js";
 import { Byte16 } from "../src/primitives/Bytes.js";
 import { verify } from "o1js";
 
@@ -20,16 +20,8 @@ const testVector1: TestVector = {
   keyHex: "2b7e151628aed2a6abf7158809cf4f3c",
 };
 
-const getCipherText = (tv: TestVector) => {
-  const keyBuffer = Buffer.from(tv.keyHex, "hex");
-  const plaintextBuffer = Buffer.from(tv.plaintextHex, "hex");
-  const cipher = crypto.createCipheriv("aes-128-ecb", keyBuffer, null);
-  cipher.setAutoPadding(false);
-  const nodeEncrypted = Buffer.concat([
-    cipher.update(plaintextBuffer),
-    cipher.final(),
-  ]);
-  return nodeEncrypted.toString("hex");
+const getCipherText = (tv: TestVector): string => {
+  return encryptAES128(tv.plaintextHex, tv.keyHex);
 };
 
 const testVectorToByte16 = (tv: TestVector) => ({
