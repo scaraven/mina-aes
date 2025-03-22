@@ -16,17 +16,17 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
     return new GcmFiniteField([top, bot, Field(0n)]);
   }
 
-  // shiftRight1(): GcmFiniteField {
-  //   const top = this.toFields()[0];
-  //   let bot = this.toFields()[1];
-  //   const rShiftBot = Gadgets.rightShift64(bot, 1);
-  //   bot = Provable.if(
-  //     Gadgets.and(top, Field(1), 64).equals(Field(1)),
-  //     Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
-  //     rShiftBot,
-  //   );
-  //   return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
-  // }
+  shiftRight1(): GcmFiniteField {
+    const top = this.toFields()[0];
+    let bot = this.toFields()[1];
+    const rShiftBot = Gadgets.rightShift64(bot, 1);
+    bot = Provable.if(
+      Gadgets.and(top, Field(1), 64).equals(Field(1)),
+      Gadgets.and(Field(BigInt(0x8000000000000000)), rShiftBot, 64),
+      rShiftBot,
+    );
+    return GcmFiniteField.fromTwoFields(Gadgets.rightShift64(top, 1), bot);
+  }
   /**
    * Perform mult operation in GF(2^128).
    * Specifically, this field is interpreted as a polynomial in GF(2). Each bit represents a coefficients.
@@ -38,10 +38,10 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
   static mul(x: GcmFiniteField, y: GcmFiniteField): GcmFiniteField {
     // Apparently this is a particular polynomial GCM uses
     const R: GcmFiniteField = GcmFiniteField.fromTwoFields(
-      Field(0xe100000000000000),
+      Field(0xe100000000000000n),
       Field(0),
     );
-    let z = GcmFiniteField.fromTwoFields(Field(0), Field(0));
+    let z: GcmFiniteField = GcmFiniteField.fromTwoFields(Field(0), Field(0));
     let v = x;
     const yTop = y.toFields()[0];
     const yBot = y.toFields()[1];
@@ -52,7 +52,6 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
           Gadgets.rightShift64(yTop, 64 - i - 1),
           64,
         ).equals(Field(1)),
-        GcmFiniteField,
         GcmFiniteField.xor(z, v),
         z,
       );
@@ -74,7 +73,6 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
       const vBot = v.toFields()[1];
       v = Provable.if(
         Gadgets.and(Field(1), vBot, 64).equals(Field(1)),
-        GcmFiniteField,
         rshV,
         GcmFiniteField.xor(rshV, R),
       );
@@ -87,7 +85,6 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
           Gadgets.rightShift64(yBot, 64 - i - 1),
           64,
         ).equals(Field(1)),
-        GcmFiniteField,
         GcmFiniteField.xor(z, v),
         z,
       );
@@ -109,7 +106,6 @@ class GcmFiniteField extends createForeignField(GCM_FINITE_SIZE) {
       const vBot = v.toFields()[1];
       v = Provable.if(
         Gadgets.and(Field(1), vBot, 64).equals(Field(1)),
-        GcmFiniteField,
         rshV,
         GcmFiniteField.xor(rshV, R),
       );
